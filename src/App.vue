@@ -30,6 +30,7 @@ export default {
       // searchResults: [],
 
       selectedLocation: { name: "Bradford", lat: 53.79391, lon: -1.75206 },
+      selectedDay: "",
       timedForecasts: [],
 
       favouriteLocations: [],
@@ -119,8 +120,6 @@ ul {
 }
 #search > *,
 #content > * {
-  display: block;
-  border: 1px solid black;
   margin-bottom: 1.5rem;
 }
 </style>
