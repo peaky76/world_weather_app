@@ -1,28 +1,66 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="main">
+    <header>
+      <h1>PEAKY'S WEATHER APP</h1>
+    </header>
+    <section id="lookup">
+      <input id="search-box" type="text" />
+      <search-results :results="searchResults"></search-results>
+    </section>
+    <section id="content">
+      <favourite-locations :locations="favouriteLocations"></favourite-locations>
+      <location-forecast :location="selectedLocation"></location-forecast>
+    </section>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import SearchResults from "./components/SearchResults";
+import FavouriteLocations from "./components/FavouriteLocations";
+import LocationForecast from "./components/LocationForecast";
 
 export default {
-  name: 'App',
+  data() {
+    return {
+      searchTerm: "Hello",
+      selectedLocation: "Bradford",
+      favouriteLocations: ["Bradford"],
+    };
+  },
+  computed: {
+    searchResults() {
+      return "Bradford";
+    },
+  },
   components: {
-    HelloWorld
-  }
-}
+    "search-results": SearchResults,
+    "favourite-locations": FavouriteLocations,
+    "location-forecast": LocationForecast,
+  },
+};
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+#main {
+  display: flex;
+  flex-wrap: wrap;
+}
+#main header {
+  width: 100%;
+}
+#main section {
+  display: block;
+  margin-right: 1.5rem;
+}
+#lookup > *,
+#content > * {
+  display: block;
+  border: 1px solid black;
+  margin-bottom: 1.5rem;
 }
 </style>
