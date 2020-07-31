@@ -5,20 +5,20 @@
     </header>
     <section id="search">
       <search-form></search-form>
-      <search-results :results="searchResults"></search-results>
+      <!-- <search-results :results="searchResults"></search-results> -->
     </section>
     <section id="content">
       <favourite-locations :locations="favouriteLocations"></favourite-locations>
-      <location-forecast :location="selectedLocation"></location-forecast>
+      <location-forecasts :forecasts="summaryForecasts"></location-forecasts>
     </section>
   </div>
 </template>
 
 <script>
 import SearchForm from "./components/SearchForm";
-import SearchResults from "./components/SearchResults";
+// import SearchResults from "./components/SearchResults";
 import FavouriteLocations from "./components/FavouriteLocations";
-import LocationForecast from "./components/LocationForecast";
+import LocationForecasts from "./components/LocationForecasts";
 import { eventBus } from "./main.js";
 
 export default {
@@ -26,11 +26,14 @@ export default {
   data() {
     return {
       searchTerm: "",
+      // searchResults: [],
+
       selectedLocation: { name: "Bradford", lat: 53.79391, lon: -1.75206 },
+      timedForecasts: [],
+
       favouriteLocations: [],
-      endPointBase:
+      forecastEndPointBase:
         "https://api.met.no/weatherapi/locationforecast/2.0/complete?",
-      searchResults: [],
       locations: [
         { name: "Edinburgh", lat: 55.953251, lon: -3.188267 },
         { name: "Glasgow", lat: 55.860916, lon: -4.251433 },
@@ -41,26 +44,40 @@ export default {
     };
   },
   computed: {
-    searchEndPoint() {
+    forecastEndPoint() {
       return (
-        this.endPointBase +
+        this.forecastEndPointBase +
         "lat=" +
         this.selectedLocation.lat +
         "&lon=" +
         this.selectedLocation.lon
       );
     },
+    summaryForecasts() {
+      return this.timedForecasts.map(
+        (forecast) => new Date(Date.parse(forecast.time))
+
+        // .map((forecast) =>
+        // Object({
+        //   time: forecast.time,
+        //   temp: forecast.data.instant.details.air_temperature,
+        //   // symbol: forecast.data.next_1_hours,
+        // rain: forecast.data.next_1_hours.details.precipitation_amount,
+        // })
+      );
+    },
   },
   components: {
     "search-form": SearchForm,
-    "search-results": SearchResults,
+    // "search-results": SearchResults,
     "favourite-locations": FavouriteLocations,
-    "location-forecast": LocationForecast,
+    "location-forecasts": LocationForecasts,
   },
   mounted() {
-    fetch(this.searchEndPoint)
+    // Get forecast for selected location
+    fetch(this.forecastEndPoint)
       .then((response) => response.json())
-      .then((data) => (this.searchResults = data));
+      .then((data) => (this.timedForecasts = data.properties.timeseries));
 
     eventBus.$on("search-term", (term) => {
       this.searchTerm = term;
