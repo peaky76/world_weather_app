@@ -19,6 +19,7 @@ import SearchForm from "./components/SearchForm";
 // import SearchResults from "./components/SearchResults";
 import FavouriteLocations from "./components/FavouriteLocations";
 import LocationForecasts from "./components/LocationForecasts";
+import moment from "moment-timezone";
 import { eventBus } from "./main.js";
 
 export default {
@@ -54,17 +55,10 @@ export default {
       );
     },
     summaryForecasts() {
-      return this.timedForecasts.map(
-        (forecast) => new Date(Date.parse(forecast.time))
-
-        // .map((forecast) =>
-        // Object({
-        //   time: forecast.time,
-        //   temp: forecast.data.instant.details.air_temperature,
-        //   // symbol: forecast.data.next_1_hours,
-        // rain: forecast.data.next_1_hours.details.precipitation_amount,
-        // })
-      );
+      return this.timedForecasts
+        .filter((forecast) => this.isInNextSevenDays(forecast.time))
+        .filter((forecast) => this.isSixOrTwelveOclock(forecast.time))
+        .map((forecast) => this.createSummaryForecast(forecast));
     },
   },
   components: {
@@ -82,6 +76,26 @@ export default {
     eventBus.$on("search-term", (term) => {
       this.searchTerm = term;
     });
+  },
+  methods: {
+    isInNextSevenDays(date_str) {
+      let now = moment();
+      let dateToTest = moment(date_str);
+      return dateToTest.diff(now, "days") < 7;
+    },
+    isSixOrTwelveOclock(date_str) {
+      let dateToTest = moment(date_str);
+      return dateToTest.hour() % 6 == 1;
+    },
+    createSummaryForecast(forecast) {
+      let summary = Object({
+        time: forecast.time,
+        temp: forecast.data.instant.details.air_temperature,
+        symbol: forecast.data.next_6_hours.summary.symbol_code,
+        rain: forecast.data.next_6_hours.details.precipitation_amount,
+      });
+      return summary;
+    },
   },
 };
 </script>
