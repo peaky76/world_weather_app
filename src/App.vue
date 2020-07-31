@@ -22,17 +22,33 @@ import LocationForecast from "./components/LocationForecast";
 import { eventBus } from "./main.js";
 
 export default {
-  name: "Weather App",
+  name: "weather-app",
   data() {
     return {
       searchTerm: "",
-      selectedLocation: "Bradford",
-      favouriteLocations: ["Bradford"],
+      selectedLocation: { name: "Bradford", lat: 53.79391, lon: -1.75206 },
+      favouriteLocations: [],
+      endPointBase:
+        "https://api.met.no/weatherapi/locationforecast/2.0/complete?",
+      searchResults: [],
+      locations: [
+        { name: "Edinburgh", lat: 55.953251, lon: -3.188267 },
+        { name: "Glasgow", lat: 55.860916, lon: -4.251433 },
+        { name: "Dundee", lat: 56.462002, lon: -2.9707 },
+        { name: "Aberdeen", lat: 57.14748, lon: -2.0954 },
+        { name: "Inverness", lat: 57.477772, lon: -4.224721 },
+      ],
     };
   },
   computed: {
-    searchResults() {
-      return "Bradford";
+    searchEndPoint() {
+      return (
+        this.endPointBase +
+        "lat=" +
+        this.selectedLocation.lat +
+        "&lon=" +
+        this.selectedLocation.lon
+      );
     },
   },
   components: {
@@ -42,13 +58,9 @@ export default {
     "location-forecast": LocationForecast,
   },
   mounted() {
-    // fetch("https://restcountries.eu/rest/v2/all")
-    //   .then((response) => response.json())
-    //   .then((data) => (this.countries = data));
-
-    // eventBus.$on("selected-country", (country) => {
-    //   this.selectedCountry = country;
-    // });
+    fetch(this.searchEndPoint)
+      .then((response) => response.json())
+      .then((data) => (this.searchResults = data));
 
     eventBus.$on("search-term", (term) => {
       this.searchTerm = term;

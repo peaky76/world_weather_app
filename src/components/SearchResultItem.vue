@@ -7,7 +7,7 @@ import { eventBus } from "../main.js";
 
 export default {
   name: "search-result-item",
-  props: "result",
+  props: ["result"],
 };
 </script>
 
