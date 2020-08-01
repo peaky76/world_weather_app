@@ -1,6 +1,6 @@
 <template>
   <ul>
-    <forecast-time v-for="(forecast, index) in forecasts" :key="index" :forecast="forecast"></forecast-time>
+    <forecast-time v-for="(forecast, index) in date" :key="index" :forecast="forecast"></forecast-time>
   </ul>
 </template>
 
@@ -9,7 +9,7 @@ import ForecastTime from "./ForecastTime";
 
 export default {
   name: "forecast-date",
-  props: ["forecasts"],
+  props: ["date"],
   components: {
     "forecast-time": ForecastTime,
   },

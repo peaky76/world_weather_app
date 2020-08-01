@@ -1,8 +1,9 @@
 <template>
-  <li>
-    <h2>{{forecast.time | formatTime}}</h2>
-    <img :src="getWeatherSymbol(forecast.symbol)" />
-    {{forecast.temp | formatTemp}} : {{forecast.rain}}
+  <li id="forecast-time">
+    <header>{{forecast.time | formatTime}}</header>
+    <img class="weather-symbol" :src="getWeatherSymbol(forecast.symbol)" />
+    {{forecast.temp | formatTemp}}
+    <!-- //: {{forecast.rain}} -->
   </li>
 </template>
 
@@ -29,4 +30,18 @@ export default {
 </script>
 
 <style>
+#forecast-time {
+  display: flex;
+  flex-direction: column;
+  margin-right: 1.5rem;
+}
+#forecast-time > * {
+  margin-bottom: 0.5rem;
+}
+.weather-symbol {
+  height: 50px;
+  width: 50px;
+  border: 1px solid black;
+  border-radius: 10px;
+}
 </style>

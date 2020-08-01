@@ -1,10 +1,9 @@
 <template>
-  <ul id="forecasts" v-if="forecasts">
-    <li id="forecast-date" v-for="(date, index) in forecastsByDate" :key="index">
-      {{date.date}}
-      <forecast-date :forecasts="date.forecasts"></forecast-date>
-    </li>
-  </ul>
+  <div v-if="location">
+    <header>{{location.name}}</header>
+    <li id="forecast-date" v-for="(day, index) in forecastsByDate" :key="index">{{day.date}}</li>
+    <forecast-date :date="selectedDate"></forecast-date>
+  </div>
 </template>
 
 <script>
@@ -15,7 +14,12 @@ import moment from "moment-timezone";
 
 export default {
   name: "location-forecasts",
-  props: ["forecasts"],
+  props: ["forecasts", "location"],
+  data() {
+    return {
+      selectedDate: "",
+    };
+  },
   components: {
     "forecast-date": ForecastDate,
   },
@@ -35,11 +39,13 @@ export default {
 </script>
 
 <style scoped>
-#forecasts {
-  display: flex;
-  flex-direction: column;
-}
 #forecast-date {
-  margin-bottom: 1em;
+  margin-bottom: 1rem;
+}
+#forecasts header,
+#forecast-date header {
+  font-size: 1.25rem;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
 }
 </style>

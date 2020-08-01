@@ -1,15 +1,14 @@
 <template>
   <div id="main">
-    <header>
-      <h1>PEAKY'S WEATHER APP</h1>
-    </header>
+    <section id="favourites">
+      <favourite-locations :locations="favouriteLocations"></favourite-locations>
+    </section>
     <section id="search">
-      <search-form></search-form>
+      <search-form :locations="locations"></search-form>
       <!-- <search-results :results="searchResults"></search-results> -->
     </section>
-    <section id="content">
-      <favourite-locations :locations="favouriteLocations"></favourite-locations>
-      <location-forecasts :forecasts="summaryForecasts"></location-forecasts>
+    <section id="forecasts">
+      <location-forecasts :forecasts="summaryForecasts" :location="selectedLocation"></location-forecasts>
     </section>
   </div>
 </template>
@@ -26,10 +25,10 @@ export default {
   name: "weather-app",
   data() {
     return {
-      searchTerm: "",
+      //searchTerm: "",
       // searchResults: [],
 
-      selectedLocation: { name: "Bradford", lat: 53.79391, lon: -1.75206 },
+      selectedLocation: null,
       selectedDay: "",
       timedForecasts: [],
 
@@ -42,18 +41,23 @@ export default {
         { name: "Dundee", lat: 56.462002, lon: -2.9707 },
         { name: "Aberdeen", lat: 57.14748, lon: -2.0954 },
         { name: "Inverness", lat: 57.477772, lon: -4.224721 },
+        { name: "Moscow", lat: 55.751244, lon: 37.618423 },
       ],
     };
   },
   computed: {
     forecastEndPoint() {
-      return (
-        this.forecastEndPointBase +
-        "lat=" +
-        this.selectedLocation.lat +
-        "&lon=" +
-        this.selectedLocation.lon
-      );
+      if (this.selectedLocation) {
+        return (
+          this.forecastEndPointBase +
+          "lat=" +
+          this.selectedLocation.lat +
+          "&lon=" +
+          this.selectedLocation.lon
+        );
+      } else {
+        return;
+      }
     },
     summaryForecasts() {
       return this.timedForecasts
@@ -69,16 +73,20 @@ export default {
     "location-forecasts": LocationForecasts,
   },
   mounted() {
-    // Get forecast for selected location
-    fetch(this.forecastEndPoint)
-      .then((response) => response.json())
-      .then((data) => (this.timedForecasts = data.properties.timeseries));
-
-    eventBus.$on("search-term", (term) => {
-      this.searchTerm = term;
+    eventBus.$on("selected-location", (location) => {
+      this.selectedLocation = location;
+      this.fetchForecastData();
     });
   },
   methods: {
+    fetchForecastData() {
+      //   Gets forecast data for selected location
+      if (this.selectedLocation) {
+        fetch(this.forecastEndPoint)
+          .then((response) => response.json())
+          .then((data) => (this.timedForecasts = data.properties.timeseries));
+      }
+    },
     isInNextSevenDays(date_str) {
       let now = moment();
       let dateToTest = moment(date_str);
@@ -102,24 +110,42 @@ export default {
 </script>
 
 <style>
+body {
+  margin: 0;
+}
 ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 #main {
-  display: flex;
-  flex-wrap: wrap;
+  width: 100vw;
+  height: 100vh;
 }
 #main header {
   width: 100%;
 }
 #main section {
   display: block;
-  margin-right: 1.5rem;
 }
 #search > *,
 #content > * {
   margin-bottom: 1.5rem;
+}
+#favourites {
+  width: 100%;
+  padding-left: 25%;
+  background: palevioletred;
+}
+#search {
+  width: calc(25% - 1.5rem);
+  float: left;
+  padding-right: 1.5rem;
+  background: paleturquoise;
+}
+#forecasts {
+  width: 75%;
+  float: right;
+  background: palegoldenrod;
 }
 </style>
