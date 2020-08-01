@@ -8,7 +8,12 @@
       <!-- <search-results :results="searchResults"></search-results> -->
     </section>
     <section id="forecasts">
-      <location-forecasts :forecasts="summaryForecasts" :location="selectedLocation"></location-forecasts>
+      <location-forecasts
+        :forecasts="summaryForecasts"
+        :location="selectedLocation"
+        :selectedDate="selectedDate"
+        :inFavourites="isSelectedInFavourites"
+      ></location-forecasts>
     </section>
   </div>
 </template>
@@ -29,7 +34,7 @@ export default {
       // searchResults: [],
 
       selectedLocation: null,
-      selectedDay: "",
+      selectedDate: moment(),
       timedForecasts: [],
 
       favouriteLocations: [],
@@ -59,6 +64,9 @@ export default {
         return;
       }
     },
+    isSelectedInFavourites() {
+      return this.favouriteLocations.includes(this.selectedLocation);
+    },
     summaryForecasts() {
       return this.timedForecasts
         .filter((forecast) => this.isInNextSevenDays(forecast.time))
@@ -73,9 +81,19 @@ export default {
     "location-forecasts": LocationForecasts,
   },
   mounted() {
+    eventBus.$on("selected-date", (date) => {
+      this.selectedDate = date;
+    });
     eventBus.$on("selected-location", (location) => {
       this.selectedLocation = location;
       this.fetchForecastData();
+    });
+    eventBus.$on("add-favourite", (location) => {
+      this.favouriteLocations.push(location);
+    });
+    eventBus.$on("remove-favourite", (location) => {
+      let index = this.favouriteLocations.indexOf(location);
+      this.favouriteLocations.splice(index, 1);
     });
   },
   methods: {
@@ -147,6 +165,8 @@ input[type="radio"] label {
   margin-bottom: 1.5rem;
 }
 #favourites {
+  display: block;
+  height: 50px;
   width: 100%;
   padding-left: 25%;
   background: palevioletred;

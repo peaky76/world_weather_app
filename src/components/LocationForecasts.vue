@@ -1,12 +1,16 @@
 <template>
   <div v-if="location">
-    <header>{{location.name}}</header>
-    <div class="radio-container" v-for="(date, index) in forecastsByDate" :key="index">
+    <header>
+      {{location.name}}
+      <button v-if="!inFavourites" v-on:click="handleAddFav">Add to favourites</button>
+    </header>
+    <div class="forecast-date" v-for="(date, index) in forecastsByDate" :key="index">
       <input
+        v-on:change="handleChangeDate"
         :id="`forecast-date` + index"
         name="forecast-date"
         type="radio"
-        v-model="selectedDate"
+        v-model="displayDate"
         :value="date"
       />
       <label :for="`forecast-date` + index">{{date.date}}</label>
@@ -17,16 +21,16 @@
 
 <script>
 import ForecastDate from "./ForecastDate";
-
+import { eventBus } from "../main.js";
 import groupBy from "lodash/groupBy";
 import moment from "moment-timezone";
 
 export default {
   name: "location-forecasts",
-  props: ["forecasts", "location"],
+  props: ["forecasts", "location", "selectedDate", "inFavourites"],
   data() {
     return {
-      selectedDate: "",
+      displayDate: "",
     };
   },
   components: {
@@ -45,18 +49,19 @@ export default {
     },
   },
   methods: {
-    handleClick() {
-      this.selectedDate = date;
+    handleAddFav() {
+      eventBus.$emit("add-favourite", this.location);
+    },
+    handleChangeDate() {
+      eventBus.$emit("selected-date", this.displayDate);
     },
   },
 };
 </script>
 
 <style scoped>
-#forecasts header,
-#forecast-date header {
-  font-size: 1.25rem;
-  text-transform: uppercase;
-  margin-bottom: 0.5rem;
+.forecast-date {
+  display: inline-block;
+  margin-right: 1rem;
 }
 </style>
