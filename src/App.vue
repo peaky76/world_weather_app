@@ -4,89 +4,103 @@
       <favourite-locations :locations="favouriteLocations"></favourite-locations>
     </section>
     <section id="search">
-      <search-form :locations="locations"></search-form>
-      <!-- <search-results :results="searchResults"></search-results> -->
+      <search-form></search-form>
+      <search-results :results="searchResults"></search-results>
     </section>
     <section id="forecasts">
       <location-forecasts
-        :forecasts="summaryForecasts"
+        :forecastsByDate="groupedForecastsByDate"
         :location="selectedLocation"
-        :selectedDate="selectedDate"
-        :inFavourites="isSelectedInFavourites"
+        :isInFavourites="isSelectedInFavourites"
       ></location-forecasts>
     </section>
+    <footer>Cities location data from https://simplemaps.com/data/world-cities</footer>
   </div>
 </template>
 
 <script>
 import SearchForm from "./components/SearchForm";
-// import SearchResults from "./components/SearchResults";
+import SearchResults from "./components/SearchResults";
 import FavouriteLocations from "./components/FavouriteLocations";
 import LocationForecasts from "./components/LocationForecasts";
+
+import groupBy from "lodash/groupBy";
 import moment from "moment-timezone";
 import { eventBus } from "./main.js";
+import json from "./assets/simplemaps_worldcities/worldcities.json";
 
 export default {
   name: "weather-app",
   data() {
     return {
-      //searchTerm: "",
-      // searchResults: [],
-
-      selectedLocation: null,
-      selectedDate: moment(),
-      timedForecasts: [],
-
+      searchTerm: "",
+      cities: json,
+      // dataDump: "",
+      selectedLocation: { name: "Edinburgh", lat: 55.953251, lng: -3.188267 },
+      allForecastsForLocation: [],
       favouriteLocations: [],
       forecastEndPointBase:
         "https://api.met.no/weatherapi/locationforecast/2.0/complete?",
-      locations: [
-        { name: "Edinburgh", lat: 55.953251, lon: -3.188267 },
-        { name: "Glasgow", lat: 55.860916, lon: -4.251433 },
-        { name: "Dundee", lat: 56.462002, lon: -2.9707 },
-        { name: "Aberdeen", lat: 57.14748, lon: -2.0954 },
-        { name: "Inverness", lat: 57.477772, lon: -4.224721 },
-        { name: "Moscow", lat: 55.751244, lon: 37.618423 },
-      ],
     };
   },
   computed: {
     forecastEndPoint() {
-      if (this.selectedLocation) {
-        return (
-          this.forecastEndPointBase +
-          "lat=" +
-          this.selectedLocation.lat +
-          "&lon=" +
-          this.selectedLocation.lon
-        );
-      } else {
-        return;
-      }
+      return (
+        this.forecastEndPointBase +
+        "lat=" +
+        this.selectedLocation.lat +
+        "&lon=" +
+        this.selectedLocation.lng
+      );
+    },
+    groupedForecastsByDate() {
+      // Group forecasts by date into a new object
+      let grouped = groupBy(this.filteredForecasts, (forecast) => {
+        return moment(forecast.time).format("ddd D MMM");
+      });
+      return grouped;
     },
     isSelectedInFavourites() {
       return this.favouriteLocations.includes(this.selectedLocation);
     },
-    summaryForecasts() {
-      return this.timedForecasts
+    filteredForecasts() {
+      return this.allForecastsForLocation
         .filter((forecast) => this.isInNextSevenDays(forecast.time))
         .filter((forecast) => this.isSixOrTwelveOclock(forecast.time))
         .map((forecast) => this.createSummaryForecast(forecast));
     },
+    searchResults() {
+      const matches = this.cities.filter((cityObj) => {
+        const length = this.searchTerm.length;
+        if (length === 0) {
+          return true;
+        }
+        if (
+          cityObj.city.toLowerCase().substring(0, length) ===
+          this.searchTerm.toLowerCase()
+        ) {
+          return true;
+        }
+        return false;
+      });
+      return matches;
+    },
   },
   components: {
     "search-form": SearchForm,
-    // "search-results": SearchResults,
+    "search-results": SearchResults,
     "favourite-locations": FavouriteLocations,
     "location-forecasts": LocationForecasts,
   },
   mounted() {
-    eventBus.$on("selected-date", (date) => {
-      this.selectedDate = date;
-    });
+    this.fetchForecastData();
+
     eventBus.$on("selected-location", (location) => {
       this.selectedLocation = location;
       this.fetchForecastData();
+    });
+    eventBus.$on("search-term", (term) => {
+      this.searchTerm = term;
     });
     eventBus.$on("add-favourite", (location) => {
       this.favouriteLocations.push(location);
@@ -102,7 +116,10 @@ export default {
       if (this.selectedLocation) {
         fetch(this.forecastEndPoint)
           .then((response) => response.json())
-          .then((data) => (this.timedForecasts = data.properties.timeseries));
+          .then(
+            (data) =>
+              (this.allForecastsForLocation = data.properties.timeseries)
+          );
       }
     },
     isInNextSevenDays(date_str) {
@@ -128,17 +145,41 @@ export default {
 </script>
 
 <style>
+/* Dusk
+#0D2C54
+#F4F3EE
+#80475E */
+html {
+  font-size: 22px;
+}
 body {
   margin: 0;
+  height: calc(100vh - 20rem);
+  padding: 1rem;
+  background-color: #183642;
+  color: #f4f3ee;
 }
-ul {
+ul,
+fieldset {
   padding: 0;
   margin: 0;
 }
 li {
   list-style-type: none;
 }
+footer {
+  width: 100%;
+  margin-right: 1rem;
+  text-align: right;
+  font-size: 0.64rem;
+}
 
+.radio-container {
+  display: inline-block;
+  height: 100%;
+  width: 5em;
+  text-align: center;
+}
 input[type="radio"] {
   display: none;
   height: 100%;
@@ -149,10 +190,10 @@ input[type="radio"] label {
   height: 100%;
   width: 100%;
 }
-
 #main {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 95%;
+  padding-top: 5%;
 }
 #main header {
   width: 100%;
@@ -165,21 +206,24 @@ input[type="radio"] label {
   margin-bottom: 1.5rem;
 }
 #favourites {
-  display: block;
-  height: 50px;
-  width: 100%;
+  height: 2rem;
+  width: 75%;
   padding-left: 25%;
-  background: palevioletred;
 }
 #search {
-  width: calc(25% - 1.5rem);
+  display: block;
+  height: 50%;
+  width: calc(20% - 1.625rem);
   float: left;
   padding-right: 1.5rem;
-  background: paleturquoise;
+  border-right: 0.125rem groove #f4f3ee;
 }
 #forecasts {
-  width: 75%;
+  display: block;
+  height: 50%;
+  width: calc(80% - 6.5rem);
   float: right;
-  background: palegoldenrod;
+  padding-left: 1.5rem;
+  padding-right: 5rem;
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <li>
-    <button v-on:click="handleCancel" :id="`cancel-fav-` + location.name">X</button>
-    <button v-on:click="handleSelect" :id="`select-fav-` + location.name">{{location.name}}</button>
+    <button v-on:click="handleCancel" :id="`cancel-fav-` + location.id">X</button>
+    <button v-on:click="handleSelect" :id="`select-fav-` + location.id">{{location.city}}</button>
   </li>
 </template>
 

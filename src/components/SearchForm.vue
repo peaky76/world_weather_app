@@ -1,13 +1,6 @@
 <template>
   <div>
-    <select v-on:change="handleSelect" v-model="selectedLocation">
-      <option
-        v-for="(location, index) in locations"
-        :key="index"
-        :value="location"
-      >{{location.name}}</option>
-    </select>
-    <!-- <input v-on:input="handleSearchInput" id="search-box" type="text" v-model="searchTerm" /> -->
+    <input v-on:input="handleInput" type="text" v-model="searchTerm" />
   </div>
 </template>
 
@@ -16,15 +9,14 @@ import { eventBus } from "../main.js";
 
 export default {
   name: "search-form",
-  props: ["locations"],
   data() {
     return {
-      selectedLocation: "",
+      searchTerm: "",
     };
   },
   methods: {
-    handleSelect() {
-      eventBus.$emit("selected-location", this.selectedLocation);
+    handleInput() {
+      eventBus.$emit("search-term", this.searchTerm);
     },
   },
 };

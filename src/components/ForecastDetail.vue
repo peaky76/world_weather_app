@@ -1,5 +1,5 @@
 <template>
-  <li id="forecast-time">
+  <li id="forecast-detail">
     <header>{{forecast.time | formatTime}}</header>
     <img class="weather-symbol" :src="getWeatherSymbol(forecast.symbol)" />
     {{forecast.temp | formatTemp}}
@@ -11,7 +11,7 @@
 import moment from "moment-timezone";
 
 export default {
-  name: "forecast-time",
+  name: "forecast-detail",
   props: ["forecast"],
   filters: {
     formatTemp(value) {
@@ -30,12 +30,12 @@ export default {
 </script>
 
 <style>
-#forecast-time {
+#forecast-detail {
   display: flex;
   flex-direction: column;
   margin-right: 1.5rem;
 }
-#forecast-time > * {
+#forecast-detail > * {
   margin-bottom: 0.5rem;
 }
 .weather-symbol {

@@ -1,10 +1,6 @@
 <template>
-  <ul v-if="results">
-    <search-result-item
-      v-for="(result, index) in results"
-      :key="index"
-      :result="result"
-    >A found location.</search-result-item>
+  <ul id="search-results" v-if="results">
+    <search-result-item v-for="(result, index) in firstTenResults" :key="index" :result="result"></search-result-item>
   </ul>
 </template>
 
@@ -17,11 +13,17 @@ export default {
   components: {
     "search-result-item": SearchResultItem,
   },
+  computed: {
+    firstTenResults() {
+      return this.results.slice(0, 10);
+    },
+  },
 };
 </script>
 
 <style>
-search-result-item {
-  background-color: palevioletred;
+#search-results {
+  display: flex;
+  flex-direction: column;
 }
 </style>

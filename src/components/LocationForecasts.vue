@@ -1,67 +1,63 @@
 <template>
   <div v-if="location">
     <header>
-      {{location.name}}
-      <button v-if="!inFavourites" v-on:click="handleAddFav">Add to favourites</button>
+      <span id="selected-location">{{location.city}}</span>
+      <button v-if="!isInFavourites" v-on:click="handleAddFav">Add to favourites</button>
     </header>
-    <div class="forecast-date" v-for="(date, index) in forecastsByDate" :key="index">
-      <input
-        v-on:change="handleChangeDate"
-        :id="`forecast-date` + index"
-        name="forecast-date"
-        type="radio"
-        v-model="displayDate"
-        :value="date"
-      />
-      <label :for="`forecast-date` + index">{{date.date}}</label>
-    </div>
-    <forecast-date :forecasts="selectedDate.forecasts"></forecast-date>
+    <fieldset>
+      <div class="radio-container" v-for="(date, index) in dates" :key="index">
+        <input
+          :id="`date-select-` + index"
+          name="date-select"
+          type="radio"
+          v-model="selectedDate"
+          :value="date"
+        />
+        <label :for="`date-select-` + index">{{date}}</label>
+      </div>
+    </fieldset>
+    <forecast-date :forecasts="dailyForecasts"></forecast-date>
   </div>
 </template>
 
 <script>
 import ForecastDate from "./ForecastDate";
 import { eventBus } from "../main.js";
-import groupBy from "lodash/groupBy";
-import moment from "moment-timezone";
 
 export default {
   name: "location-forecasts",
-  props: ["forecasts", "location", "selectedDate", "inFavourites"],
-  data() {
-    return {
-      displayDate: "",
-    };
-  },
+  props: ["forecastsByDate", "location", "isInFavourites"],
   components: {
     "forecast-date": ForecastDate,
   },
+  data() {
+    return {
+      selectedDate: "",
+    };
+  },
   computed: {
-    forecastsByDate() {
-      // Group forecasts by date into a new object
-      let grouped = groupBy(this.forecasts, (forecast) => {
-        return moment(forecast.time).format("ddd D MMM");
-      });
-      // Map that object to an array of objects and return
-      return Object.keys(grouped).map((key) =>
-        Object({ date: key, forecasts: grouped[key] })
-      );
+    dailyForecasts() {
+      if (this.selectedDate) {
+        return this.forecastsByDate[this.selectedDate];
+      } else {
+        return null;
+      }
+    },
+    dates() {
+      return Object.keys(this.forecastsByDate);
     },
   },
   methods: {
     handleAddFav() {
+      console.log("Adding favourite");
       eventBus.$emit("add-favourite", this.location);
-    },
-    handleChangeDate() {
-      eventBus.$emit("selected-date", this.displayDate);
     },
   },
 };
 </script>
 
-<style scoped>
-.forecast-date {
-  display: inline-block;
-  margin-right: 1rem;
-}
+<style>
+/* #selected-location {
+  font-size: 1.25rem;
+} */
 </style>

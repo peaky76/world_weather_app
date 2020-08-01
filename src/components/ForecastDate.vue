@@ -1,17 +1,17 @@
 <template>
   <ul>
-    <forecast-time v-for="(forecast, index) in forecasts" :key="index" :forecast="forecast"></forecast-time>
+    <forecast-detail v-for="(forecast, index) in forecasts" :key="index" :forecast="forecast"></forecast-detail>
   </ul>
 </template>
 
 <script>
-import ForecastTime from "./ForecastTime";
+import ForecastDetail from "./ForecastDetail";
 
 export default {
   name: "forecast-date",
   props: ["forecasts"],
   components: {
-    "forecast-time": ForecastTime,
+    "forecast-detail": ForecastDetail,
   },
 };
 </script>
