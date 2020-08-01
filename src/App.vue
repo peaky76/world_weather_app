@@ -114,10 +114,24 @@ body {
   margin: 0;
 }
 ul {
-  list-style: none;
   padding: 0;
   margin: 0;
 }
+li {
+  list-style-type: none;
+}
+
+input[type="radio"] {
+  display: none;
+  height: 100%;
+  width: 100%;
+}
+input[type="radio"] label {
+  display: none;
+  height: 100%;
+  width: 100%;
+}
+
 #main {
   width: 100vw;
   height: 100vh;

@@ -1,8 +1,17 @@
 <template>
   <div v-if="location">
     <header>{{location.name}}</header>
-    <li id="forecast-date" v-for="(day, index) in forecastsByDate" :key="index">{{day.date}}</li>
-    <forecast-date :date="selectedDate"></forecast-date>
+    <div class="radio-container" v-for="(date, index) in forecastsByDate" :key="index">
+      <input
+        :id="`forecast-date` + index"
+        name="forecast-date"
+        type="radio"
+        v-model="selectedDate"
+        :value="date"
+      />
+      <label :for="`forecast-date` + index">{{date.date}}</label>
+    </div>
+    <forecast-date :forecasts="selectedDate.forecasts"></forecast-date>
   </div>
 </template>
 
@@ -35,13 +44,15 @@ export default {
       );
     },
   },
+  methods: {
+    handleClick() {
+      this.selectedDate = date;
+    },
+  },
 };
 </script>
 
 <style scoped>
-#forecast-date {
-  margin-bottom: 1rem;
-}
 #forecasts header,
 #forecast-date header {
   font-size: 1.25rem;
