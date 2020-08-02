@@ -1,7 +1,9 @@
 <template>
   <li v-on:click="handleClick" class="search-result-item">
-    <span class="city">{{result.city}}</span>
-    <span class="country">{{result.country}}</span>
+    <span id="search-result-city" class="city">{{result.city}}</span>
+    <br />
+    <span id="search-result-admin" class="admin">{{result.admin_name}}</span>
+    <span id="search-result-country" class="country">{{result.country}}</span>
   </li>
 </template>
 
@@ -21,18 +23,22 @@ export default {
 
 <style>
 .search-result-item {
-  font-size: 0.8rem;
+  font-size: 1.25rem;
   margin-bottom: 0.5rem;
 }
 .search-result-item:hover {
   cursor: pointer;
 }
-.country {
-  font-size: 0.64rem;
+.country,
+.admin {
   text-transform: uppercase;
   color: grey;
+  font-size: 0.64em;
 }
-.country::before {
-  content: "\00a0";
+.admin {
+  font-style: italic;
+}
+.admin::after {
+  content: ",\00a0";
 }
 </style>

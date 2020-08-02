@@ -1,5 +1,6 @@
 <template>
-  <ul v-if="locations">
+  <ul v-if="locations.length">
+    <span id="favs-label">Favourites:</span>
     <favourite-item v-for="(location, index) in locations" :key="index" :location="location"></favourite-item>
   </ul>
 </template>
@@ -16,5 +17,13 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+ul {
+  display: flex;
+  align-items: center;
+}
+#favs-label {
+  font-variant: small-caps;
+  margin-right: 1rem;
+}
 </style>
