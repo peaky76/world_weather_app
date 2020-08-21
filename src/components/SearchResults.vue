@@ -1,6 +1,6 @@
 <template>
   <ul id="search-results" v-if="results">
-    <search-result-item v-for="(result, index) in firstEightResults" :key="index" :result="result"></search-result-item>
+    <search-result-item v-for="(result, index) in firstSixResults" :key="index" :result="result"></search-result-item>
   </ul>
 </template>
 
@@ -14,8 +14,8 @@ export default {
     "search-result-item": SearchResultItem,
   },
   computed: {
-    firstEightResults() {
-      return this.results.slice(0, 8);
+    firstSixResults() {
+      return this.results.slice(0, 6);
     },
   },
 };

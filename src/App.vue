@@ -75,11 +75,11 @@ export default {
         .map((forecast) => this.createSummaryForecast(forecast));
     },
     searchResults() {
+      const length = this.searchTerm.length;
+      if (length === 0) {
+        return this.cities;
+      }
       const matches = this.cities.filter((cityObj) => {
-        const length = this.searchTerm.length;
-        if (length === 0) {
-          return true;
-        }
         if (
           cityObj.city.toLowerCase().substring(0, length) ===
           this.searchTerm.toLowerCase()
@@ -252,12 +252,12 @@ input[type="radio"] label:hover {
 #main section {
   background-color: inherit;
 }
-#search > *,
-#content > * {
+#search > *:first-child,
+#content > *:first-child {
   margin-bottom: 1.5rem;
 }
 #favourites {
-  height: 2.5rem;
+  height: 2rem;
   flex-basis: 100%;
   padding-top: 0.5rem;
   padding-left: calc(20% + 1.5rem);

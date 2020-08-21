@@ -18,7 +18,11 @@ export default {
   props: ["forecast"],
   filters: {
     formatRain(value) {
-      return "Rain: " + value + "mm";
+      if (value > 0) {
+        return "Rain: " + value + "mm";
+      } else {
+        return "No rain";
+      }
     },
     formatTemp(value) {
       return Math.round(value).toString() + "\u00b0" + "C";
