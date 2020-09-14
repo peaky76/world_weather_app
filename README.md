@@ -1,4 +1,4 @@
-# weather_app
+# World Weather App
 
 This weather app was created as a weekend project during the CodeClan Professional Software Development course Jun - Oct 2020. 
 It allows a user to search for worldwide weather forecasts via the Norwegian Met Office API.
